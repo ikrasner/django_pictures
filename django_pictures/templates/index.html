@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load static %}
+{% load thumbnail %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Picture Loader</title>
+</head>
+<body>
+<h1>Uploaded Pictures</h1>
+
+    <div class="grid-container">
+        {% for im in images %}
+        <div class="grid-item">
+            <a href="{{ im.image.url }}" download="{{ im.image.pk }}">
+                {% thumbnail im.image "100x100" crop="center" upscale=True as thmb %}
+                        <img src="{{ thmb.url }}" />
+                {% endthumbnail %}
+            </a>
+            <br>
+            <a href="{% url 'image_remove' image_pk=im.pk %}">[X]</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% if images.has_other_pages %}
+        {% include "paginator.html" with items=page paginator=paginator %}
+    {% endif %}
+
+    <form action="{% url 'image_upload' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</body>
+</html>

@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+./django_pictures/media
+./django_pictures/static
+.idea
