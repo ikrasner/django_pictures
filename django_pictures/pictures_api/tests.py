@@ -9,29 +9,24 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 
-class TestApi(TestCase):
+class TestImagesApi(TestCase):
     @classmethod
-    def setUpClass(cls):
-        super(TestApi, cls).setUpClass()
-        cls.image_1_w = 10
-        cls.image_1_h = 15
-        cls.image_1 = models.Image(
-            image=cls.generate_image_file(
-                name="image_1", size=(cls.image_1_w, cls.image_1_h)
-            ),
+    def setUp(self):
+        image_1_w = 10
+        image_1_h = 15
+        self.image_1 = models.Image(
+            image=self.generate_image_file(name="image_1", size=(image_1_w, image_1_h)),
         )
 
-        cls.image_1.save()
+        self.image_1.save()
 
-        cls.image_2_w = 10
-        cls.image_2_h = 15
-        cls.image_2 = models.Image(
-            image=cls.generate_image_file(
-                name="image_2", size=(cls.image_2_w, cls.image_2_h)
-            ),
+        image_2_w = 44
+        image_2_h = 14
+        self.image_2 = models.Image(
+            image=self.generate_image_file(name="image_2", size=(image_2_w, image_2_h)),
         )
 
-        cls.image_2.save()
+        self.image_2.save()
 
     @staticmethod
     def generate_image_file(
@@ -45,11 +40,12 @@ class TestApi(TestCase):
 
     def test_get_image_by_id(self):
         client = APIClient()
-        image_id = 1
+        image_id = self.image_1.id
         response = client.get(reverse("image-detail", args=[image_id]), format="json")
         actual_image = response.json()
-        assert actual_image["height"] == type(self).image_1_h
-        assert actual_image["width"] == type(self).image_1_w
+        assert actual_image["height"] == type(self).image_1.image.height
+        assert actual_image["width"] == type(self).image_1.image.width
+        assert actual_image["size"] == type(self).image_1.image.size
 
     def test_get_images_list(self):
         client = APIClient()
@@ -58,9 +54,9 @@ class TestApi(TestCase):
         assert len(actual_image_list) == Image.objects.count()
 
     def test_delete_image_by_id(self):
-        ...
-        # client = APIClient()
-        # response = client.get(reverse("image-remove"), format="json")
-        # actual_image_list = response.json()
-        # print(actual_image_list)
-        # assert len(actual_image_list) == Image.objects.count()
+        client = APIClient()
+        image_id = self.image_1.pk
+
+        assert Image.objects.filter(pk=image_id).exists()
+        client.delete(reverse("image-detail", args=[image_id]), format="json")
+        assert not Image.objects.filter(pk=image_id).exists()

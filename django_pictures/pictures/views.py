@@ -1,4 +1,3 @@
-from django.core.paginator import Paginator
 from django.shortcuts import redirect
 from django.shortcuts import render
 
@@ -20,17 +19,6 @@ def image_upload(request):
 
 
 def image_view(request):
-    # TODO add pagination
     form = PictureUpload()
     uploaded_images = Image.objects.all()
-
-    paginator = Paginator(uploaded_images, 16)
-    page_number = request.GET.get("page")
-    page = paginator.get_page(page_number)
-    # if request.method != 'POST':
-    #     return render(
-    #     request,
-    #     "index.html", {"form": form, "images": page})
-    return render(
-        request, "index.html", {"form": form, "images": page, "paginator": paginator}
-    )
+    return render(request, "index.html", {"form": form, "images": uploaded_images})

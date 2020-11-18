@@ -8,7 +8,7 @@ class ImageSerializer(serializers.ModelSerializer):
     thumbnail_url = serializers.SerializerMethodField("get_thumbnail_url")
     height = serializers.SerializerMethodField("get_image_height")
     width = serializers.SerializerMethodField("get_image_width")
-    # size = serializers.SerializerMethodField('get_image_height')
+    size = serializers.SerializerMethodField("get_file_size")
 
     def get_image_height(self, instance):
         return instance.image.height
@@ -20,8 +20,11 @@ class ImageSerializer(serializers.ModelSerializer):
         return instance.image.url
 
     def get_thumbnail_url(self, instance):
-        return get_thumbnail(instance.image, "100x100", crop="center", quality=99).url
+        return get_thumbnail(instance.image, "100x100", crop="center", upscale=True).url
+
+    def get_file_size(self, instance):
+        return instance.image.size
 
     class Meta:
-        fields = ("id", "image_url", "thumbnail_url", "height", "width")
+        fields = ("id", "image_url", "thumbnail_url", "height", "width", "size")
         model = Image
